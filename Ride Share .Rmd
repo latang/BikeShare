@@ -1,0 +1,87 @@
+---
+title: "Bike Share Challenge"
+author: "Lauren Tang"
+date: "11/5/2018"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Bike Share Challenge Code
+
+```{r Bike Share}
+library(readr)
+data <- read_csv("los-angeles-metro-bike-share-trip-data/metro-bike-share-trip-data.csv")
+```
+
+# Most Popular Start/Stop Stations
+``` {Start/Stop}
+bikestart <- data[5]
+bikeend <- data[8]
+mostStart <- sort(table(bikestart), decreasing = TRUE)
+mostStartStations <- as.data.frame(mostStart)
+colnames(mostStartStations) <- c("Starting Station ID", "Frequency")
+mostEnd <- sort(table(bikeend), decreasing = TRUE)
+mostEndStations <- as.data.frame(mostEnd)
+colnames(mostEndStations) <- c("Ending Station ID", "Frequency")
+
+```
+
+# Average Distance Traveled
+``` {Distance}
+latLongs <- data[c(6,7,9,10)]
+lat1 <- latLongs1[c(1,2)]
+lat2 <- latLongs1[c(3,4)]
+lat1$dist <- distHaversine(lat1[c(2,1)],lat2[c(2,1)], r= 6378137)
+mean(lat1$dist)
+
+```
+
+## Ride Share As Part of Regular Commute
+``` {Commuters}
+passType <- as.data.fram(sort(table(data$`Passholder Type`)))
+
+```
+
+## Total Rides by Day of the Week
+``` {Total Rides By Day}
+# Format Data, Extract Date
+dataDate <- data
+dataDate$Date <- as.Date(dataDate$`Start Time`,format = "%Y-%m-%d %H:%M:%S")
+# Convert to day of the week
+dataDate$Day <- format(as.Date(dataDate$Date, "%Y-%m-%d"), "%A")
+totalRides <- sort(table(dataDate$Day), decreasing = T)
+rideByDay <- as.data.frame(totalRides)
+
+Day <- rideByDay$Var1
+# Plot 
+TotalRides <- ggplot(rideByDay, aes(Var1, Freq, fill = Day)) + geom_bar(stat = "identity") + xlab("Day of Week") + ylab("Number of Rides") + ggtitle("Total Rides Aggregated By Day of the Week") + geom_text(aes(label=Freq), vjust=1.6, color="white", size=3.5)
+
+```
+
+# Total Rides by Day of the Week
+``` {Total Rides By Month}
+
+# Extract Month from Data
+dataDate$Month <- format(as.Date(dataDate$Date, "%Y-%m-%d"), "%m")
+ridesByMonth <- as.data.frame(sort(table(dataDate$Month), decreasing = T))
+colnames(ridesByMonth) <- c("Month", "Frequency")
+
+# Plot 
+RidesByMonth <- ggplot(data = ridesByMonth, aes(Month, Frequency, fill = Month)) + geom_bar(stat="identity") + geom_text(aes(label=Frequency), vjust=1.5, color="white", size=3.5) + xlab("Month") + ylab("Number of Rides") + ggtitle("Total Rides Aggregated By Month")
+
+```
+
+# Top 5 Most Used Bikes
+``` {Top 5 Bikes}
+
+# Extract top 5 most used bikes
+Top5Bikes <- as.data.frame(sort(table(data$`Bike ID`), decreasing = T)[1:5])
+
+# Plot 
+Top5BikesGraph <- ggplot(data = Top5Bikes, aes(Var1, Freq, fill = Var1)) + geom_bar(stat="identity") + geom_text(aes(label=Freq), vjust=1.6, color="white", size=3.5) + xlab("Bike ID") + ylab("Number of Uses") + ggtitle("Top 5 Most Used Bikes")
+
+```
+
